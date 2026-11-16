@@ -6,7 +6,10 @@ RUN apt-get update \
     && docker-php-ext-install -j"$(nproc)" gd mbstring mysqli \
     && rm -rf /var/lib/apt/lists/*
 
-RUN curl -fsSL https://resources.mybb.com/downloads/mybb_1841.zip -o /tmp/mybb.zip \
+ARG MYBB_VERSION=1.8.41
+
+RUN mybb_release_code="$(printf '%s' "$MYBB_VERSION" | tr -d '.')" \
+    && curl -fsSL "https://resources.mybb.com/downloads/mybb_${mybb_release_code}.zip" -o /tmp/mybb.zip \
     && echo '00d4c742782e23319698c758293cd272d5fc9a6093caad739403fc99963331d8d7cfaafbd25d3acdf003c64b29b4f471568ce5c388b469947f756fee7917933e  /tmp/mybb.zip' | sha512sum -c - \
     && unzip -q /tmp/mybb.zip 'Upload/*' -d /opt/mybb \
     && rm /tmp/mybb.zip
