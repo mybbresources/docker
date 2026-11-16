@@ -1,0 +1,16 @@
+{
+  "files": [
+    {
+      "source": "inc/plugins/mybbresources_repository.php",
+      "destination": "inc/plugins/mybbresources_repository.php"
+    },
+    {
+      "source": "admin/modules/config/mybbresources_repository.php",
+      "destination": "admin/modules/config/mybbresources_repository.php"
+    },
+    {
+      "source": "config/trusted-keys.json",
+      "destination": "inc/plugins/mybb-tooling/config/trusted-keys.json"
+    }
+  ]
+}

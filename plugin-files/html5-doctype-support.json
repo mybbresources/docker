@@ -1,0 +1,8 @@
+{
+  "files": [
+    {
+      "source": "inc/plugins/html5_doctype.php",
+      "destination": "inc/plugins/html5_doctype.php"
+    }
+  ]
+}

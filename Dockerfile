@@ -15,6 +15,8 @@ RUN mybb_release_code="$(printf '%s' "$MYBB_VERSION" | tr -d '.')" \
     && rm /tmp/mybb.zip
 
 # Default MyBB Resources packages, pinned by commit and archive SHA-256.
+COPY plugin-files/ /usr/local/share/mybb/plugin-files/
+COPY stage-package.php /usr/local/lib/mybb/stage-package.php
 COPY bundle-defaults /usr/local/bin/bundle-defaults
 RUN sh /usr/local/bin/bundle-defaults \
     mybbforums-plugin a566ab70218a93b3f16a65cc97163fb4d4a3bcb6 0cc40e46f2f091fafc3b994c0d8c52747f8486c8579013dc1064580d1b46a0d8 \

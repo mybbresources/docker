@@ -1,0 +1,80 @@
+{
+  "files": [
+    {
+      "source": "core-plugin/inc/plugins/mybb_tooling_core.php",
+      "destination": "inc/plugins/mybb_tooling_core.php"
+    },
+    {
+      "source": "autoload.php",
+      "destination": "inc/plugins/mybb-tooling/autoload.php"
+    },
+    {
+      "source": "src/BootstrapSet.php",
+      "destination": "inc/plugins/mybb-tooling/src/BootstrapSet.php"
+    },
+    {
+      "source": "src/CatalogClient.php",
+      "destination": "inc/plugins/mybb-tooling/src/CatalogClient.php"
+    },
+    {
+      "source": "src/CatalogException.php",
+      "destination": "inc/plugins/mybb-tooling/src/CatalogException.php"
+    },
+    {
+      "source": "src/CatalogPagination.php",
+      "destination": "inc/plugins/mybb-tooling/src/CatalogPagination.php"
+    },
+    {
+      "source": "src/Compatibility.php",
+      "destination": "inc/plugins/mybb-tooling/src/Compatibility.php"
+    },
+    {
+      "source": "src/CoreMigrationRecovery.php",
+      "destination": "inc/plugins/mybb-tooling/src/CoreMigrationRecovery.php"
+    },
+    {
+      "source": "src/CoreRuntime.php",
+      "destination": "inc/plugins/mybb-tooling/src/CoreRuntime.php"
+    },
+    {
+      "source": "src/DatabaseTools.php",
+      "destination": "inc/plugins/mybb-tooling/src/DatabaseTools.php"
+    },
+    {
+      "source": "src/Manifest.php",
+      "destination": "inc/plugins/mybb-tooling/src/Manifest.php"
+    },
+    {
+      "source": "src/OfficialMyBBArchive.php",
+      "destination": "inc/plugins/mybb-tooling/src/OfficialMyBBArchive.php"
+    },
+    {
+      "source": "src/OfficialMyBBRelease.php",
+      "destination": "inc/plugins/mybb-tooling/src/OfficialMyBBRelease.php"
+    },
+    {
+      "source": "src/OfficialMyBBUpgrade.php",
+      "destination": "inc/plugins/mybb-tooling/src/OfficialMyBBUpgrade.php"
+    },
+    {
+      "source": "src/PackageManager.php",
+      "destination": "inc/plugins/mybb-tooling/src/PackageManager.php"
+    },
+    {
+      "source": "src/PluginInventory.php",
+      "destination": "inc/plugins/mybb-tooling/src/PluginInventory.php"
+    },
+    {
+      "source": "src/PluginLifecycle.php",
+      "destination": "inc/plugins/mybb-tooling/src/PluginLifecycle.php"
+    },
+    {
+      "source": "src/RepositoryMetadataCache.php",
+      "destination": "inc/plugins/mybb-tooling/src/RepositoryMetadataCache.php"
+    },
+    {
+      "source": "src/TextTable.php",
+      "destination": "inc/plugins/mybb-tooling/src/TextTable.php"
+    }
+  ]
+}

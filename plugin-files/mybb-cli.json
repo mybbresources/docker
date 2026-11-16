@@ -1,0 +1,9 @@
+{
+  "files": [
+    {
+      "source": "bin/mybb",
+      "destination": "inc/plugins/data/mybb-tooling/bin/mybb",
+      "executable": true
+    }
+  ]
+}

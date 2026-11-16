@@ -1,0 +1,24 @@
+{
+  "files": [
+    {
+      "source": "mybbforums/mybbforums.php",
+      "destination": "inc/plugins/mybbforums.php"
+    },
+    {
+      "source": "mybbforums/inc/plugins/lib.php",
+      "destination": "inc/plugins/mybbforums/lib.php"
+    },
+    {
+      "source": "mybbforums/inc/tasks/mybbforums.php",
+      "destination": "inc/tasks/mybbforums.php"
+    },
+    {
+      "source": "mybbforums/admin/modules/config/mybbforums.php",
+      "destination": "admin/modules/config/mybbforums.php"
+    },
+    {
+      "source": "mybbforums/mybbforums-verify.php",
+      "destination": "mybbforums-verify.php"
+    }
+  ]
+}
