@@ -1,16 +1,46 @@
 #!/bin/sh
 set -eu
 
-if [ ! -f /var/www/html/index.php ]; then
-    cp -a /opt/mybb/Upload/. /var/www/html/
+document_root=/var/www/html
+
+if [ ! -f "$document_root/index.php" ]; then
+    cp -a /opt/mybb/Upload/. "$document_root/"
 fi
 
+for directory in inc install cache uploads; do
+    test -d "$document_root/$directory"
+    test ! -L "$document_root/$directory"
+done
+
+# The volume may already contain files owned by the previous image's PHP worker.
+# Normalize the tree without following symlinks.
+chown -hR root:root "$document_root"
+find "$document_root" \( -type d -o -type f \) -exec chmod go-w {} +
+
 for directory in cache uploads; do
-    chown -R www-data:www-data "/var/www/html/$directory"
+    path="$document_root/$directory"
+    chown -hR www-data:www-data "$path"
+    find "$path" -type d -exec chmod 0755 {} +
+    find "$path" -type f -exec chmod 0644 {} +
 done
+
 for file in inc/config.php inc/settings.php; do
-    touch "/var/www/html/$file"
-    chown www-data:www-data "/var/www/html/$file"
+    path="$document_root/$file"
+    test ! -L "$path"
+    touch "$path"
+    test -f "$path"
 done
-chown www-data:www-data /var/www/html/install
+
+chown www-data:www-data "$document_root/inc/settings.php"
+chmod 0600 "$document_root/inc/settings.php"
+
+if [ -f "$document_root/install/lock" ]; then
+    chown root:www-data "$document_root/inc/config.php"
+    chmod 0640 "$document_root/inc/config.php"
+else
+    # MyBB writes its database configuration and creates install/lock during setup.
+    chown www-data:www-data "$document_root/inc/config.php" "$document_root/install"
+    chmod 0600 "$document_root/inc/config.php"
+fi
+
 exec apache2-foreground
