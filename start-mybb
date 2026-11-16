@@ -1,0 +1,16 @@
+#!/bin/sh
+set -eu
+
+if [ ! -f /var/www/html/index.php ]; then
+    cp -a /opt/mybb/Upload/. /var/www/html/
+fi
+
+for directory in cache uploads; do
+    chown -R www-data:www-data "/var/www/html/$directory"
+done
+for file in inc/config.php inc/settings.php; do
+    touch "/var/www/html/$file"
+    chown www-data:www-data "/var/www/html/$file"
+done
+chown www-data:www-data /var/www/html/install
+exec apache2-foreground
