@@ -15,13 +15,12 @@ permissions:
   contents: read
   packages: write
 
-concurrency:
-  group: publish-image-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   publish:
     if: inputs.alias_version == '' && (github.ref == 'refs/heads/main' || github.ref_type == 'tag')
+    concurrency:
+      group: publish-image-${{ github.ref }}
+      cancel-in-progress: true
     outputs:
       version: ${{ steps.release.outputs.version }}
     runs-on: ubuntu-latest
