@@ -23,6 +23,5 @@ while [ "$#" -gt 0 ]; do
 done
 
 printf '{"version":"0.1.0"}\n' > "$payload/inc/plugins/mybb-tooling/version.json"
-put mybb-cli/bin/mybb inc/plugins/data/mybb-tooling/bin/mybb 0755
 # The repository plugin uses this marker for its installed state.
 printf '0.1.5\n' > "$payload/inc/plugins/data/mybbresources-repository-installed"
