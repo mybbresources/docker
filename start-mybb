@@ -43,4 +43,6 @@ else
     chmod 0600 "$document_root/inc/config.php"
 fi
 
+php /usr/local/lib/mybb/install-defaults.php "$document_root"
+
 exec apache2-foreground

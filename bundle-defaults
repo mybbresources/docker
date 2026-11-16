@@ -1,0 +1,45 @@
+#!/bin/sh
+set -eu
+
+payload=/opt/mybb-defaults
+mkdir -p "$payload"
+stage=$(mktemp -d)
+trap 'rm -rf "$stage"' EXIT
+
+fetch() {
+    repo=$1
+    commit=$2
+    checksum=$3
+    mkdir "$stage/$repo"
+    curl -fsSL "https://codeload.github.com/mybbresources/$repo/tar.gz/$commit" -o "$stage/source.tar.gz"
+    printf '%s  %s\n' "$checksum" "$stage/source.tar.gz" | sha256sum -c -
+    tar -xzf "$stage/source.tar.gz" --strip-components=1 -C "$stage/$repo"
+}
+
+put() {
+    install -D -m "${3:-0644}" "$stage/$1" "$payload/$2"
+}
+
+while [ "$#" -gt 0 ]; do
+    fetch "$1" "$2" "$3"
+    shift 3
+done
+
+put mybbforums-plugin/mybbforums/mybbforums.php inc/plugins/mybbforums.php
+put mybbforums-plugin/mybbforums/inc/plugins/lib.php inc/plugins/mybbforums/lib.php
+put mybbforums-plugin/mybbforums/inc/tasks/mybbforums.php inc/tasks/mybbforums.php
+put mybbforums-plugin/mybbforums/admin/modules/config/mybbforums.php admin/modules/config/mybbforums.php
+put mybbforums-plugin/mybbforums/mybbforums-verify.php mybbforums-verify.php
+put html5-doctype-support/inc/plugins/html5_doctype.php inc/plugins/html5_doctype.php
+put mybb-plugin-repository/inc/plugins/mybbresources_repository.php inc/plugins/mybbresources_repository.php
+put mybb-plugin-repository/admin/modules/config/mybbresources_repository.php admin/modules/config/mybbresources_repository.php
+put mybb-tooling-core/core-plugin/inc/plugins/mybb_tooling_core.php inc/plugins/mybb_tooling_core.php
+put mybb-tooling-core/autoload.php inc/plugins/mybb-tooling/autoload.php
+put mybb-plugin-repository/config/trusted-keys.json inc/plugins/mybb-tooling/config/trusted-keys.json
+for path in "$stage"/mybb-tooling-core/src/*.php; do
+    put "mybb-tooling-core/src/${path##*/}" "inc/plugins/mybb-tooling/src/${path##*/}"
+done
+printf '{"version":"0.1.0"}\n' > "$payload/inc/plugins/mybb-tooling/version.json"
+put mybb-cli/bin/mybb inc/plugins/data/mybb-tooling/bin/mybb 0755
+# The repository plugin uses this marker for its installed state.
+printf '0.1.5\n' > "$payload/inc/plugins/data/mybbresources-repository-installed"
