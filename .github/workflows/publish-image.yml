@@ -5,6 +5,11 @@ on:
     branches: [main]
     tags: ["[0-9]+.[0-9]+.[0-9]+-[0-9]+"]
   workflow_dispatch:
+    inputs:
+      alias_version:
+        description: Refresh this MyBB version alias from published revisions
+        type: string
+        required: false
 
 permissions:
   contents: read
@@ -16,7 +21,9 @@ concurrency:
 
 jobs:
   publish:
-    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
+    if: inputs.alias_version == '' && (github.ref == 'refs/heads/main' || github.ref_type == 'tag')
+    outputs:
+      version: ${{ steps.release.outputs.version }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
@@ -29,6 +36,7 @@ jobs:
           persist-credentials: false
 
       - name: Validate release tag
+        id: release
         if: github.ref_type == 'tag'
         run: |
           version="$(sed -n 's/^ARG MYBB_VERSION=//p' Dockerfile)"
@@ -36,6 +44,7 @@ jobs:
             echo "Release tag must be ${version}-<positive image revision>."
             exit 1
           fi
+          printf 'version=%s\n' "$version" >> "$GITHUB_OUTPUT"
 
       - name: Build and validate image
         run: |
@@ -58,3 +67,47 @@ jobs:
             docker tag "${IMAGE}:sha-${GITHUB_SHA}" "${IMAGE}:latest"
             docker push "${IMAGE}:latest"
           fi
+
+  update-version-alias:
+    needs: publish
+    if: >-
+      ${{ !cancelled() &&
+          ((needs.publish.result == 'success' && needs.publish.outputs.version != '') ||
+           (github.ref == 'refs/heads/main' && inputs.alias_version != '')) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    concurrency:
+      group: mybb-version-alias-${{ inputs.alias_version || needs.publish.outputs.version }}
+      cancel-in-progress: false
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      IMAGE: ghcr.io/mybbresources/docker
+      VERSION: ${{ inputs.alias_version || needs.publish.outputs.version }}
+    steps:
+      - name: Alias the highest published image revision
+        run: |
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Expected a MyBB version such as 1.8.41."
+            exit 1
+          fi
+          tags="$(gh api --paginate orgs/mybbresources/packages/container/docker/versions \
+            --jq '.[].metadata.container.tags[]')"
+          revision="$(printf '%s\n' "$tags" | awk -v version="$VERSION" '
+            index($0, version "-") == 1 {
+              revision = substr($0, length(version) + 2)
+              if (revision ~ /^[1-9][0-9]*$/) print revision
+            }
+          ' | sort -n | tail -n 1)"
+          if [[ -z "$revision" ]]; then
+            echo "No published image revisions found for MyBB $VERSION."
+            exit 1
+          fi
+          printf '%s' "$GH_TOKEN" | docker login ghcr.io --username "$GITHUB_ACTOR" --password-stdin
+          source="$IMAGE:$VERSION-$revision"
+          target="$IMAGE:$VERSION"
+          docker buildx imagetools create --prefer-index=false --tag "$target" "$source"
+          source_digest="$(docker buildx imagetools inspect --format '{{.Manifest.Digest}}' "$source")"
+          target_digest="$(docker buildx imagetools inspect --format '{{.Manifest.Digest}}' "$target")"
+          test -n "$source_digest"
+          test "$source_digest" = "$target_digest"
+          printf '%s points to %s (%s)\n' "$target" "$source" "$target_digest"
