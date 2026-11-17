@@ -67,7 +67,7 @@ jobs:
             '\''
             test -x /var/www/html/inc/plugins/data/mybb-tooling/bin/mybb
             test -f /var/www/html/inc/plugins/mybbforums.php
-            test -f /var/www/html/inc/plugins/html5_doctype.php
+            test ! -e /var/www/html/inc/plugins/html5_doctype.php
             runuser -u www-data -- test ! -w /var/www/html/inc/plugins
           '
 
